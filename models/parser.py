@@ -41,7 +41,7 @@ class Parser:
                         _id, _title, _wid, _dur, _url in zip(lids, titles, wids, durations, urls)]
 
             self.lections_list_len = len(lectures)
-            return lectures
+            yield lectures
 
     def parse_courses_list(self):
         with self.session.get("https://codewithmosh.com/courses/", cookies=self.cookies, verify=False) as courses_list:
@@ -52,7 +52,8 @@ class Parser:
 
             courses = [Course(_id=_id, title=Utils.flush(_title)) for _id, _title in zip(ids, titles)]
             self.courses_list_len = len(courses)
-            return courses
+            yield courses
+
 
     def __init__(self):
         self.session = requests.Session()

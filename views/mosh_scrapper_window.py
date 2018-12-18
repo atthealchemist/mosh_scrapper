@@ -52,24 +52,34 @@ class MoshScrapperWindow(QMainWindow):
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.frame)
         self.horizontalLayout.setObjectName("horizontalLayout")
 
-        self.verticalLayoutInfo = QtWidgets.QVBoxLayout()
-        self.verticalLayoutInfo.setObjectName("verticalLayoutInfo")
-
-        self.labelSelectedCourses = QtWidgets.QLabel(self.frame)
+        self.gridLayoutInfo = QtWidgets.QGridLayout()
+        self.gridLayoutInfo.setObjectName("gridLayoutInfo")
 
         font = QtGui.QFont()
         font.setPointSize(14)
 
+        self.labelSelectedCourses = QtWidgets.QLabel(self.frame)
         self.labelSelectedCourses.setFont(font)
-
         self.labelSelectedCourses.setObjectName("labelSelectedCourses")
-
-        self.verticalLayoutInfo.addWidget(self.labelSelectedCourses)
+        self.gridLayoutInfo.addWidget(self.labelSelectedCourses)
+        self.gridLayoutInfo.addWidget(self.labelSelectedCourses, 0, 0, 1, 1)
 
         self.labelDownloadPath = QtWidgets.QLabel(self.frame)
         self.labelDownloadPath.setObjectName("labelDownloadPath")
-        self.verticalLayoutInfo.addWidget(self.labelDownloadPath)
-        self.horizontalLayout.addLayout(self.verticalLayoutInfo)
+        self.gridLayoutInfo.addWidget(self.labelDownloadPath, 1, 0, 1, 1)
+
+        self.labelSelectedCoursesValue = QtWidgets.QLabel(self.frame)
+        self.labelSelectedCoursesValue.setText("")
+        self.labelSelectedCoursesValue.setObjectName("labelSelectedCoursesValue")
+        self.gridLayoutInfo.addWidget(self.labelSelectedCoursesValue, 0, 1, 1, 1)
+
+        self.labelDownloadPathValue = QtWidgets.QLabel(self.frame)
+        self.labelDownloadPathValue.setText("")
+        self.labelDownloadPathValue.setObjectName("labelDownloadPathValue")
+        self.gridLayoutInfo.addWidget(self.labelDownloadPathValue, 1, 1, 1, 1)
+
+        self.horizontalLayout.addLayout(self.gridLayoutInfo)
+
         self.pushButtonUpdateMetadata = QtWidgets.QPushButton(self.frame)
         font = QtGui.QFont()
         font.setPointSize(18)
@@ -85,9 +95,9 @@ class MoshScrapperWindow(QMainWindow):
         font = QtGui.QFont()
         font.setPointSize(18)
         self.pushButtonDownloadCourses.setFont(font)
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("/usr/share/icons/Faenza/status/48/aptdaemon-download.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButtonDownloadCourses.setIcon(icon1)
+        downloadCoursesIcon = QtGui.QIcon()
+        downloadCoursesIcon.addPixmap(QtGui.QPixmap("/usr/share/icons/Faenza/status/48/aptdaemon-download.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButtonDownloadCourses.setIcon(downloadCoursesIcon)
         self.pushButtonDownloadCourses.setIconSize(QtCore.QSize(48, 48))
         self.pushButtonDownloadCourses.setAutoDefault(False)
         self.pushButtonDownloadCourses.setDefault(True)
@@ -95,14 +105,17 @@ class MoshScrapperWindow(QMainWindow):
         self.pushButtonDownloadCourses.setObjectName("pushButtonDownloadCourses")
         self.horizontalLayout.addWidget(self.pushButtonDownloadCourses)
         self.verticalLayout.addWidget(self.frame)
+
         self.groupBoxProgress = QtWidgets.QGroupBox(self.centralwidget)
         self.groupBoxProgress.setObjectName("groupBoxProgress")
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.groupBoxProgress)
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+
+        self.horizontalLayoutProgressBar = QtWidgets.QHBoxLayout(self.groupBoxProgress)
+        self.horizontalLayoutProgressBar.setObjectName("horizontalLayoutProgressBar")
         self.progressBarOverallProgress = QtWidgets.QProgressBar(self.groupBoxProgress)
         self.progressBarOverallProgress.setProperty("value", 0)
         self.progressBarOverallProgress.setObjectName("progressBarOverallProgress")
-        self.horizontalLayout_2.addWidget(self.progressBarOverallProgress)
+        self.horizontalLayoutProgressBar.addWidget(self.progressBarOverallProgress)
+
         self.verticalLayout.addWidget(self.groupBoxProgress)
         self.setCentralWidget(self.centralwidget)
 
@@ -123,8 +136,8 @@ class MoshScrapperWindow(QMainWindow):
         __sortingEnabled = self.treeWidgetCourses.isSortingEnabled()
         self.treeWidgetCourses.setSortingEnabled(False)
         self.treeWidgetCourses.setSortingEnabled(__sortingEnabled)
-        self.labelSelectedCourses.setText(_translate("MainWindow", "Selected courses: 2 (~300 Mb)"))
-        self.labelDownloadPath.setText(_translate("MainWindow", "Download path: ~/Downloads/Courses/"))
+        self.labelSelectedCourses.setText(_translate("MainWindow", "Selected courses:"))
+        self.labelDownloadPath.setText(_translate("MainWindow", "Download path:"))
         self.pushButtonUpdateMetadata.setText(_translate("MainWindow", "Update metadata"))
         self.pushButtonDownloadCourses.setText(_translate("MainWindow", "Download courses (26)"))
         self.groupBoxProgress.setTitle(_translate("MainWindow", "Overall progress:"))
