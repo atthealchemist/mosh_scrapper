@@ -7,7 +7,7 @@ class Lecture(Entity):
         return vars(self)
 
     def __repr__(self):
-        return vars(self)
+        return f'{vars(self)}'
 
     def __init__(self, _id=0, title='', duration=0, path='', source=''):
         super().__init__(_id=_id, title=title)

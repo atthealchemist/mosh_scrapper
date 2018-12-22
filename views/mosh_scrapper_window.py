@@ -3,10 +3,11 @@ import json
 from pathlib import Path
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem, QMessageBox
+from PyQt5.QtCore import Qt, QThreadPool
+from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem, QMessageBox, QAbstractItemView
 
-from models.downloader import Downloader
+from models.workers.download_course_worker import DownloadCourseWorker
+from models.workers.download_metadata_worker import MetadataWorker
 from models.entities.Course import Course
 from models.entities.Lecture import Lecture
 from widgets.QScrapperTreeItem import QScrapperTreeItem
@@ -37,6 +38,8 @@ class MoshScrapperWindow(QMainWindow):
 
         self.treeWidgetCourses.setColumnWidth(0, 200)
         self.treeWidgetCourses.setColumnWidth(5, 150)
+
+        self.treeWidgetCourses.setSelectionMode(QAbstractItemView.MultiSelection)
 
         # self.treeWidgetCourses.resizeColumnToContents(2)
         # self.treeWidgetCourses.resizeColumnToContents(3)
@@ -142,17 +145,17 @@ class MoshScrapperWindow(QMainWindow):
         self.pushButtonDownloadCourses.setText(_translate("MainWindow", "Download courses (26)"))
         self.groupBoxProgress.setTitle(_translate("MainWindow", "Overall progress:"))
 
-    def addTreeItem(self, entity, parent, checkable=False):
+    def addTreeItem(self, entity, parent, checkable=False, ready=False):
         treeItem = QScrapperTreeItem(parent, entity)
         if checkable:
             treeItem.setFlags(treeItem.flags() | Qt.ItemIsUserCheckable)
         if entity.lectures:
             for item in entity.lectures:
                 newChild = QScrapperTreeItem(treeItem, item)
-                newChild.downloaded = False
+                newChild.downloaded = ready
                 treeItem.addChild(newChild)
         if type(parent) is QTreeWidgetItem:
-            treeItem.downloaded = False
+            treeItem.downloaded = ready
             parent.addChild(treeItem)
         # else:
         #     parent.addTopLevelItem(newItem)
@@ -164,11 +167,11 @@ class MoshScrapperWindow(QMainWindow):
             for course in metadata:
                 c = Course(_id=course.get('id'), title=course.get('title'))
                 for idx, lecture in enumerate(course.get('lectures')):
-                    l = Lecture(_id=lecture.get('id'), title=f"{idx}. {lecture.get('title')}", source=lecture.get('source'))
+                    l = Lecture(_id=lecture.get('id'), title=f"{idx}. {lecture.get('title')}", path=lecture.get('path'))
                     c.lectures.append(l)
                 self.addTreeItem(c, self.treeWidgetCourses, True)
         else:
-            self.downloader.download_metadata()
+            QThreadPool.globalInstance().start(self.metadataWorker)
 
     def onUpdateMetadata(self):
         self.loadMetadata()
@@ -178,10 +181,30 @@ class MoshScrapperWindow(QMainWindow):
 
     def onExceptionRaise(self, message):
         QMessageBox.warning(self, "Exception!", message)
+        self.close()
+        raise Exception(message)
+
 
     def onCompletedTask(self):
-        QMessageBox.information(parent=self, title='Info', text="Task completed!")
+        QMessageBox.information(self, 'Info', "Task completed!")
         self.log("Task completed!")
+
+    def onAppendCourse(self, entity):
+        self.addTreeItem(entity, self.treeWidgetCourses, True)
+
+    def onCoursesDownload(self):
+        for item in self.treeWidgetCourses.selectedItems():
+            self.courseWorker = DownloadCourseWorker(courses=item.entity)
+            QThreadPool.globalInstance().start(self.courseWorker)
+
+    def onItemSelectionChanged(self):
+        totalLecturesCount = 0
+        for item in self.treeWidgetCourses.selectedItems():
+            if hasattr(item.entity, 'lectures'):
+                totalLecturesCount += len(item.entity.lectures)
+            else:
+                totalLecturesCount += 1
+        self.pushButtonDownloadCourses.setText(f"Download ({totalLecturesCount})")
 
     def log(self, message):
         self.statusBar().showMessage(message)
@@ -191,12 +214,16 @@ class MoshScrapperWindow(QMainWindow):
         super(MoshScrapperWindow, self).__init__()
         self.setupUi()
 
-        self.downloader = Downloader()
+        self.metadataWorker = MetadataWorker()
 
-        self.downloader.progressSignal.connect(self.onUpdateProgress)
-        self.downloader.errorSignal.connect(self.onExceptionRaise)
-        self.downloader.completedSignal.connect(self.onCompletedTask)
-        self.downloader.logSignal.connect(self.log)
+        self.metadataWorker.downloader.courseReadySignal.connect(self.onAppendCourse)
+        self.metadataWorker.downloader.totalProgressSignal.connect(self.onUpdateProgress)
+        self.metadataWorker.downloader.errorSignal.connect(self.onExceptionRaise)
+        self.metadataWorker.downloader.completedSignal.connect(self.onCompletedTask)
+        self.metadataWorker.downloader.logSignal.connect(self.log)
 
         self.pushButtonUpdateMetadata.clicked.connect(self.onUpdateMetadata)
 
+        self.pushButtonDownloadCourses.clicked.connect(self.onCoursesDownload)
+
+        self.treeWidgetCourses.itemSelectionChanged.connect(self.onItemSelectionChanged)

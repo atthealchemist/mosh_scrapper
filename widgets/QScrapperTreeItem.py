@@ -47,6 +47,7 @@ class QScrapperTreeItem(QTreeWidgetItem):
 
     def __init__(self, parent, entity):
         super(QScrapperTreeItem, self).__init__(parent)
+        self.entity = entity
 
         # column 0 - Course/Lecture Title
         self.setText(0, entity.title)
@@ -85,4 +86,7 @@ class QScrapperTreeItem(QTreeWidgetItem):
         self.itemPathLabel.setTextInteractionFlags(Qt.TextBrowserInteraction)
         # self.itemPathLabel.setAlignment(Qt.AlignCenter)
         self.treeWidget().setItemWidget(self, 5, self.itemPathLabel)
+
+        if self.downloaded:
+            self.itemProgressBar.setVisible(False)
 
