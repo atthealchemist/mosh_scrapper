@@ -31,8 +31,12 @@ class Utils:
             path.mkdir(parents=True)
         try:
             path = Path(path) / filename
-            path.write_bytes(content)
-            completed = True
+            if not path.is_file():
+                path.write_bytes(content)
+                completed = True
+            else:
+                print('File already downloaded, skipping...')
+                return
         except Exception as ex:
             print("Can't write file! Details: \n{}".format(ex))
         finally:

@@ -29,7 +29,7 @@
 },
 {
     "domain": ".codewithmosh.com",
-    "expirationDate": 1576601405,
+    "expirationDate": 1577390288,
     "hostOnly": false,
     "httpOnly": false,
     "name": "ajs_group_id",
@@ -43,7 +43,7 @@
 },
 {
     "domain": ".codewithmosh.com",
-    "expirationDate": 1576601405,
+    "expirationDate": 1577390298,
     "hostOnly": false,
     "httpOnly": false,
     "name": "ajs_user_id",
@@ -71,7 +71,7 @@
 },
 {
     "domain": "codewithmosh.com",
-    "expirationDate": 1547657406.54627,
+    "expirationDate": 1548446300.249268,
     "hostOnly": true,
     "httpOnly": true,
     "name": "_session_id",
@@ -80,12 +80,12 @@
     "secure": false,
     "session": false,
     "storeId": "0",
-    "value": "3b86a5e44f241f63c9771d736771b534",
+    "value": "5d97f5758e5ce92f78dcb1003987462b",
     "id": 6
 },
 {
     "domain": "codewithmosh.com",
-    "expirationDate": 1547668205,
+    "expirationDate": 1548457087,
     "hostOnly": true,
     "httpOnly": false,
     "name": "ac_enable_tracking",
@@ -99,7 +99,7 @@
 },
 {
     "domain": "codewithmosh.com",
-    "expirationDate": 1545065466,
+    "expirationDate": 1545854360,
     "hostOnly": true,
     "httpOnly": false,
     "name": "ahoy_events",
@@ -113,7 +113,7 @@
 },
 {
     "domain": "codewithmosh.com",
-    "expirationDate": 1545079804.126395,
+    "expirationDate": 1545868698.805932,
     "hostOnly": true,
     "httpOnly": false,
     "name": "ahoy_visit",
@@ -122,7 +122,7 @@
     "secure": false,
     "session": false,
     "storeId": "0",
-    "value": "84d1cc6d-2182-4eb8-aff4-3bdcd1cd8724",
+    "value": "6d49c8f9-f693-4e86-a5b6-32790ce8d4f8",
     "id": 9
 },
 {
@@ -141,7 +141,7 @@
 },
 {
     "domain": "codewithmosh.com",
-    "expirationDate": 1547020462.220497,
+    "expirationDate": 1548273472.739377,
     "hostOnly": true,
     "httpOnly": true,
     "name": "remember_user_token",
@@ -150,7 +150,7 @@
     "secure": false,
     "session": false,
     "storeId": "0",
-    "value": "BAhbCFsGaQQmOSgBSSIiJDJhJDEwJHpDa3J0WnE4a2ZIc2d1YlF6ekVBQS4GOgZFVEkiFzE1NDQ2MDEyNjIuNDM1MzU5NwY7AEY%3D--81dd13cab9775cd90d2f0191d9bcef66ee1dc8e6",
+    "value": "BAhbCFsGaQQmOSgBSSIiJDJhJDEwJHpDa3J0WnE4a2ZIc2d1YlF6ekVBQS4GOgZFVEkiFjE1NDU4NTQyNzIuMTY4NjI2BjsARg%3D%3D--84b924262f90daa0733194543a180b1d4cce5a40",
     "id": 11
 },
 {

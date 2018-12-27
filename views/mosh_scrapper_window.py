@@ -7,6 +7,7 @@ from PyQt5.QtCore import Qt, QThreadPool
 from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem, QMessageBox, QAbstractItemView
 
 from models.workers.download_course_worker import DownloadCourseWorker
+from models.workers.download_lecture_worker import DownloadLectureWorker
 from models.workers.download_metadata_worker import MetadataWorker
 from models.entities.Course import Course
 from models.entities.Lecture import Lecture
@@ -165,11 +166,11 @@ class MoshScrapperWindow(QMainWindow):
         if Path('metadata.json').exists():
             metadata = json.loads(Path('metadata.json').read_text())
             for course in metadata:
-                c = Course(_id=course.get('id'), title=course.get('title'))
+                newCourse = Course(_id=course.get('id'), title=course.get('title'))
                 for idx, lecture in enumerate(course.get('lectures')):
                     l = Lecture(_id=lecture.get('id'), title=f"{idx}. {lecture.get('title')}", path=lecture.get('path'))
-                    c.lectures.append(l)
-                self.addTreeItem(c, self.treeWidgetCourses, True)
+                    newCourse.lectures.append(l)
+                self.addTreeItem(newCourse, self.treeWidgetCourses, True)
         else:
             QThreadPool.globalInstance().start(self.metadataWorker)
 
@@ -194,17 +195,24 @@ class MoshScrapperWindow(QMainWindow):
 
     def onCoursesDownload(self):
         for item in self.treeWidgetCourses.selectedItems():
-            self.courseWorker = DownloadCourseWorker(courses=item.entity)
-            QThreadPool.globalInstance().start(self.courseWorker)
+            if item.entity.__class__.__name__ == 'Course':
+                self.courseWorker = DownloadCourseWorker(courses=item.entity)
+                QThreadPool.globalInstance().start(self.courseWorker)
+            else:
+                self.lectureWorker = DownloadLectureWorker(lecture=item.entity)
+                QThreadPool.globalInstance().start(self.lectureWorker)
 
     def onItemSelectionChanged(self):
         totalLecturesCount = 0
+        totalCoursesCount = 0
         for item in self.treeWidgetCourses.selectedItems():
             if hasattr(item.entity, 'lectures'):
                 totalLecturesCount += len(item.entity.lectures)
+                totalCoursesCount += 1
             else:
                 totalLecturesCount += 1
         self.pushButtonDownloadCourses.setText(f"Download ({totalLecturesCount})")
+        self.labelSelectedCoursesValue.setText(f"{totalCoursesCount}")
 
     def log(self, message):
         self.statusBar().showMessage(message)

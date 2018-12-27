@@ -27,6 +27,10 @@ class Downloader(QObject):
     def download_course(self, course):
         self.log(f"Downloading {course.title}...")
         for idx, lecture in enumerate(course.lectures):
+            path = Path("mosh_courses") / course.title / f"{lecture.title}.mp4"
+            if path.exists():
+                print(f"{lecture.title}.mp4 is already downloaded, skipping...")
+                continue
             if lecture.path != "":
                 if "filepicker" in lecture.path:
                     self.log(
@@ -41,8 +45,9 @@ class Downloader(QObject):
         filename = f"{lecture.title}.mp4"
         course_dir = Path("mosh_courses").resolve() / course_title
         file = requests.get(lecture.path)
+        file_size = int(file.headers['Content-Length'])
         print(download_lecture_from_course_template.substitute(lecture=filename, course=course_title,
-                                                               directory=course_dir))
+                                                               directory=course_dir, fileSize=file_size))
         Utils.write_file(course_dir, filename, file.content)
         file.close()
 
@@ -78,29 +83,6 @@ class Downloader(QObject):
                 self.courseReadySignal.emit(course)
                 self.totalProgressSignal.emit(round(idx + 1 / self.parser.get_courses_count() * 100))
 
-                # Course put
-                # self.log(f'[{idx+1} of {self.parser.get_courses_count()}] Processing {course.id} - {course.title}')
-                # self.course_queue.put(course)
-                # self.log(f'put course {course.title} ({self.parser.get_lectures_count()} lectures)')
-
-                # Lecture put
-                # self.lect_queue.put(next(self.parser.parse_lectures_list(course.id)))
-                # self.log(f'put lecture {lecture.title}')
-
-                # Lecture get
-                # while self.lect_queue.qsize() > 0:
-                #     idx = self.parser.get_lectures_count() - self.lect_queue.qsize()
-                #     lecture = self.lect_queue.get()
-                #     self.log(f'\t[{idx} of {self.parser.get_lectures_count()}] Course #{course.id} - {course.title} added lecture: {lecture.title} ')
-                #     course.lectures.append(lecture.dict())
-
-                # Course get
-                # while self.course_queue.qsize() > 0:
-                #     course = self.course_queue.get()
-                #     idx = self.parser.get_courses_count() - self.course_queue.qsize()
-                #     self.courses.append(course.dict())
-                #     self.courseReadySignal.emit(course)
-                #     self.totalProgressSignal.emit(round(idx + 1 / self.parser.get_courses_count() * 100))
             self.completedSignal.emit()
         except Exception as ex:
             self.errorSignal.emit(f'''[!] An exception was raised. Details:\n{ex}\n
